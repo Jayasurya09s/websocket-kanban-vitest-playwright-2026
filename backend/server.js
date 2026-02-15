@@ -2,7 +2,10 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
+
 const registerTaskHandlers = require("./socket/taskHandlers");
+const uploadRoute = require("./routes/upload");
+
 const connectDB = require("./config/db");
 
 const app = express();
@@ -16,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // static folder for uploads
 app.use("/uploads", express.static("uploads"));
-
+app.use("/api/upload", uploadRoute);
+  
 const io = new Server(server, {
   cors: {
     origin: "*",
