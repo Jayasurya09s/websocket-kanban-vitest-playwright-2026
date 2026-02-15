@@ -2,7 +2,8 @@ const { io } = require("socket.io-client");
 
 console.log("Starting socket test...");
 
-const socket = io("http://localhost:5000", {
+const socket = io("https://websocket-kanban-vitest-playwright-2026-2lb6.onrender.com", {
+
   transports: ["websocket"],
   timeout: 5000
 });
