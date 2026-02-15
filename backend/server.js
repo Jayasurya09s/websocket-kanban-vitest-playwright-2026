@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
-
+const registerTaskHandlers = require("./socket/taskHandlers");
 const connectDB = require("./config/db");
 
 const app = express();
@@ -25,14 +25,16 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log(" User connected:", socket.id);
+  console.log("User connected:", socket.id);
 
-  // we will register handlers here later
+  // register all task events
+  registerTaskHandlers(io, socket);
 
   socket.on("disconnect", () => {
     console.log(" User disconnected:", socket.id);
   });
 });
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () =>
