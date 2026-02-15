@@ -1,12 +1,23 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
 
-  socketId: String, // for realtime tracking
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
 
-  lastSeen: Date
+  password: {
+    type: String,
+    required: true
+  }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
