@@ -8,7 +8,8 @@ import { useAuth } from "./context/AuthContext";
 
 function Private({ children }) {
   const { token } = useAuth();
-  return token ? children : <Navigate to="/login" />;
+  const storedToken = token || localStorage.getItem("token");
+  return storedToken ? children : <Navigate to="/login" />;
 }
 
 export default function App() {

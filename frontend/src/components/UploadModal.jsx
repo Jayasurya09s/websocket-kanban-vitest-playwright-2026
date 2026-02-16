@@ -46,21 +46,21 @@ export default function UploadModal({ task, close }) {
       }}
     >
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="glass rounded-3xl p-8 w-full max-w-md space-y-6"
+        exit={{ scale: 0.96, opacity: 0 }}
+        className="glass-panel p-8 w-full max-w-md space-y-6"
       >
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Attachment</p>
-          <h2 className="text-2xl font-semibold text-indigo-200 mt-2">Upload file</h2>
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Attachment</p>
+          <h2 className="text-2xl font-semibold text-white mt-2">Upload file</h2>
           <p className="text-sm text-slate-400 mt-1">Task: {task.title}</p>
         </div>
 
-        <div className="border-2 border-dashed border-indigo-500/40 rounded-2xl p-6 text-center">
-          <FaCloudUploadAlt className="w-12 h-12 mx-auto text-indigo-400 mb-3" />
+        <div className="border-2 border-dashed border-emerald-500/30 rounded-2xl p-6 text-center">
+          <FaCloudUploadAlt className="w-12 h-12 mx-auto text-emerald-300 mb-3" />
           <label className="cursor-pointer">
-            <span className="text-indigo-300 font-semibold">Choose file</span>
+            <span className="text-emerald-200 font-semibold">Choose file</span>
             <input
               type="file"
               onChange={(e) => setFile(e.target.files?.[0])}
@@ -73,14 +73,14 @@ export default function UploadModal({ task, close }) {
         </div>
 
         <div className="flex gap-3">
-          <button onClick={close} className="flex-1 btn-secondary">
+          <button onClick={close} className="flex-1 btn btn-secondary">
             Cancel
           </button>
 
           <button
             onClick={upload}
             disabled={isUploading || !file}
-            className="flex-1 btn-primary glow disabled:opacity-60"
+            className="flex-1 btn btn-primary disabled:opacity-60"
           >
             {isUploading ? "Uploading..." : "Upload"}
           </button>

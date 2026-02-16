@@ -12,6 +12,25 @@ const boardSchema = new mongoose.Schema({
     default: ""
   },
 
+  background: {
+    type: String,
+    default: "aurora"
+  },
+
+  swimlaneMode: {
+    type: String,
+    enum: ["none", "priority", "member"],
+    default: "none"
+  },
+
+  powerUps: {
+    type: Object,
+    default: {
+      calendar: false,
+      analytics: true
+    }
+  },
+
   columns: {
     type: [String],
     default: ["todo", "in-progress", "done"]

@@ -44,6 +44,38 @@ const taskSchema = new mongoose.Schema({
     }
   ],
 
+  labels: {
+    type: [String],
+    default: []
+  },
+
+  checklist: {
+    type: [
+      {
+        text: { type: String, required: true },
+        done: { type: Boolean, default: false }
+      }
+    ],
+    default: []
+  },
+
+  dueDate: {
+    type: Date,
+    default: null
+  },
+
+  members: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ],
+
+  order: {
+    type: Number,
+    default: 0
+  },
+
   createdBy: {
     type: String,
     default: "anonymous"

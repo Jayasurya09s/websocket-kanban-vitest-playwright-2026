@@ -40,6 +40,12 @@ class TaskService {
       board = await Board.create({ name: "Main Board" });
     }
 
+    const lastTask = await Task.findOne({
+      isDeleted: false,
+      column: data.column || "todo"
+    }).sort({ order: -1 });
+    const nextOrder = lastTask ? lastTask.order + 1 : 0;
+
     const task = await Task.create({
       title: data.title,
       description: data.description || "",
@@ -47,6 +53,11 @@ class TaskService {
       category: data.category || "feature",
       column: data.column || "todo",
       boardId: board._id,
+      labels: data.labels || [],
+      checklist: data.checklist || [],
+      dueDate: data.dueDate || null,
+      members: data.members || [],
+      order: typeof data.order === "number" ? data.order : nextOrder,
       createdBy: user,
       updatedBy: user
     });
@@ -66,7 +77,8 @@ class TaskService {
   async getAllTasks() {
     return await Task.find({ isDeleted: false })
       .populate("attachments")
-      .sort({ createdAt: -1 });
+      .populate("members", "username email")
+      .sort({ order: 1, createdAt: 1 });
   }
 
   // 🔹 Update Task
@@ -101,8 +113,15 @@ class TaskService {
     const task = await Task.findById(taskId);
     if (!task) throw new Error("Task not found");
 
+    const lastTask = await Task.findOne({
+      isDeleted: false,
+      column: newColumn
+    }).sort({ order: -1 });
+    const nextOrder = lastTask ? lastTask.order + 1 : 0;
+
     const oldColumn = task.column;
     task.column = newColumn;
+    task.order = nextOrder;
     task.updatedBy = user;
 
     await task.save();
@@ -116,6 +135,36 @@ class TaskService {
     });
 
     return task;
+  }
+
+  // 🔹 Reorder Tasks in Column
+  async reorderTasks(column, orderedIds, user = "anonymous") {
+    if (!validColumns.includes(column)) {
+      throw new Error("Invalid column");
+    }
+
+    const tasks = await Task.find({
+      _id: { $in: orderedIds },
+      column,
+      isDeleted: false
+    });
+
+    const tasksById = new Map(tasks.map((task) => [String(task._id), task]));
+
+    await Promise.all(
+      orderedIds.map((id, index) => {
+        const task = tasksById.get(String(id));
+        if (!task) return null;
+        task.order = index;
+        task.updatedBy = user;
+        return task.save();
+      })
+    );
+
+    return await Task.find({ isDeleted: false })
+      .populate("attachments")
+      .populate("members", "username email")
+      .sort({ order: 1, createdAt: 1 });
   }
 
   // 🔹 Delete Task (soft delete)

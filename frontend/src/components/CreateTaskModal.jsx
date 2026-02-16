@@ -7,6 +7,9 @@ export default function CreateTaskModal({ open, onClose }) {
   const [desc, setDesc] = useState("");
   const [priority, setPriority] = useState("medium");
   const [category, setCategory] = useState("feature");
+  const [labels, setLabels] = useState([]);
+  const [labelInput, setLabelInput] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!open) return null;
@@ -23,17 +26,29 @@ export default function CreateTaskModal({ open, onClose }) {
         title: title.trim(),
         description: desc.trim(),
         priority,
-        category
+        category,
+        labels,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null
       });
 
       setTitle("");
       setDesc("");
       setPriority("medium");
       setCategory("feature");
+      setLabels([]);
+      setLabelInput("");
+      setDueDate("");
       onClose();
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const addLabel = () => {
+    const next = labelInput.trim();
+    if (!next || labels.includes(next)) return;
+    setLabels((prev) => [...prev, next]);
+    setLabelInput("");
   };
 
   return (
@@ -47,14 +62,14 @@ export default function CreateTaskModal({ open, onClose }) {
       }}
     >
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="glass rounded-3xl p-8 w-full max-w-md space-y-6"
+        exit={{ scale: 0.96, opacity: 0 }}
+        className="glass-panel p-8 w-full max-w-md space-y-6"
       >
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">New item</p>
-          <h2 className="text-2xl font-semibold text-indigo-200 mt-2">Create Task</h2>
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">New item</p>
+          <h2 className="text-2xl font-semibold text-white mt-2">Create Task</h2>
         </div>
 
         <div className="space-y-4">
@@ -94,20 +109,64 @@ export default function CreateTaskModal({ open, onClose }) {
               <option value="enhancement">Enhancement</option>
             </select>
           </div>
+
+          <div>
+            <label className="text-xs uppercase tracking-widest text-slate-500 mb-2 block">
+              Due date
+            </label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="input-field"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs uppercase tracking-widest text-slate-500 mb-2 block">
+              Labels
+            </label>
+            <div className="flex gap-2">
+              <input
+                value={labelInput}
+                onChange={(e) => setLabelInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addLabel();
+                  }
+                }}
+                placeholder="Add label"
+                className="input-field"
+              />
+              <button type="button" onClick={addLabel} className="btn btn-secondary text-xs px-3">
+                Add
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {labels.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setLabels((prev) => prev.filter((item) => item !== label))}
+                  className="text-[11px] px-2 py-1 rounded-full border border-white/10 text-slate-200 bg-white/5"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 btn-secondary"
-          >
+          <button onClick={onClose} className="flex-1 btn btn-secondary">
             Cancel
           </button>
 
           <button
             onClick={create}
             disabled={isSubmitting || !title.trim()}
-            className="flex-1 btn-primary glow disabled:opacity-60"
+            className="flex-1 btn btn-primary disabled:opacity-60"
           >
             {isSubmitting ? "Creating..." : "Create Task"}
           </button>

@@ -11,6 +11,8 @@ const registerTaskHandlers = require("./socket/taskHandlers");
 const uploadRoute = require("./routes/upload");
 const activityRoute = require("./routes/activity");
 const authRoute = require("./routes/auth");
+const usersRoute = require("./routes/users");
+const boardRoute = require("./routes/board");
 
 const connectDB = require("./config/db");
 
@@ -43,6 +45,8 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/upload", uploadRoute);
 app.use("/api/activity", activityRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/users", usersRoute);
+app.use("/api/board", boardRoute);
 
 // ================= SOCKET =================
 const io = new Server(server, {

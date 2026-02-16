@@ -9,7 +9,8 @@ const activitySchema = new mongoose.Schema({
       "TASK_UPDATED",
       "TASK_DELETED",
       "TASK_MOVED",
-      "ATTACHMENT_ADDED"
+      "ATTACHMENT_ADDED",
+      "TASK_REORDERED"
     ],
     required: true
   },

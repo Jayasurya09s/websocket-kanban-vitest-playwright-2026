@@ -68,6 +68,24 @@ module.exports = function registerTaskHandlers(io, socket) {
     }
   });
 
+  // ================= REORDER TASKS =================
+  socket.on("task:reorder", async ({ column, orderedIds }, callback) => {
+    try {
+      const tasks = await taskService.reorderTasks(
+        column,
+        orderedIds,
+        socket.id
+      );
+
+      io.emit("sync:tasks", tasks);
+      callback?.({ status: "ok" });
+
+    } catch (err) {
+      console.error("Reorder error:", err.message);
+      callback?.({ status: "error", message: err.message });
+    }
+  });
+
   // ================= DELETE TASK =================
   socket.on("task:delete", async (taskId, callback) => {
     try {

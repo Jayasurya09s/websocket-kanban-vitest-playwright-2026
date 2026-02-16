@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import API from "../api/http";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -24,51 +25,85 @@ export default function Login() {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") submit();
+  };
+
   return (
-    <div className="app-bg flex items-center justify-center px-6 py-16">
-      <div className="grid w-full max-w-4xl gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
-        <div className="hidden lg:block">
-          <p className="badge">Secure access</p>
-          <h2 className="section-title mt-6">Welcome back to your realtime workspace.</h2>
-          <p className="mt-4 text-slate-400">
-            Sign in to continue shaping product flow, analytics, and collaborative velocity. Everything stays in sync.
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center px-6 py-16 noise-overlay">
+      <div className="w-full max-w-md relative z-10">
+        <Link to="/" className="inline-block mb-8">
+          <motion.div whileHover={{ scale: 1.03 }} className="text-2xl font-semibold text-white">
+            Kanban<span className="gradient-text">Flow</span>
+          </motion.div>
+        </Link>
 
-        <div className="glass rounded-3xl p-8 md:p-10">
-          <h2 className="text-3xl mb-2 text-indigo-200 font-semibold">Login</h2>
-          <p className="text-sm text-slate-400 mb-6">Use your workspace credentials to continue.</p>
-
-          <div className="space-y-4">
-            <input
-              placeholder="Email"
-              className="input-field"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-
-            <input
-              placeholder="Password"
-              type="password"
-              className="input-field"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="glass-panel p-8 md:p-10"
+        >
+          <div className="mb-8">
+            <h2 className="text-3xl font-semibold text-white mb-2">Welcome back</h2>
+            <p className="text-sm text-slate-400">Sign in to continue managing your workspace.</p>
           </div>
 
-          <button
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs uppercase tracking-widest text-slate-500 mb-2 block">
+                Email
+              </label>
+              <input
+                placeholder="you@example.com"
+                className="input-field"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs uppercase tracking-widest text-slate-500 mb-2 block">
+                Password
+              </label>
+              <input
+                placeholder="••••••••"
+                type="password"
+                className="input-field"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+            </div>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={submit}
             disabled={isLoading}
-            className="btn-primary glow w-full mt-6 disabled:opacity-60"
+            className="btn btn-primary w-full mt-6 py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Signing in..." : "Login"}
-          </button>
+            {isLoading ? (
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                ⏳
+              </motion.span>
+            ) : (
+              "Sign In"
+            )}
+          </motion.button>
 
-          <p className="text-sm mt-6 text-slate-400">
-            No account?{" "}
-            <Link to="/register" className="text-indigo-300">
-              Create one
+          <p className="text-sm mt-6 text-slate-400 text-center">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-emerald-300 hover:text-emerald-200 transition-colors font-semibold">
+              Sign up
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
