@@ -3,9 +3,17 @@ const taskService = require("../services/taskService");
 module.exports = function registerTaskHandlers(io, socket) {
 
   const getActor = (user) => {
-    if (!user) return "anonymous";
-    if (typeof user === "string") return user;
-    return user.username || user.email || user.id || "anonymous";
+    // If user data is explicitly passed, use it
+    if (user) {
+      if (typeof user === "string") return user;
+      return user.username || user.email || user.id || "anonymous";
+    }
+
+    // Fall back to socket's identified user info
+    const userInfo = socket.getUserInfo?.();
+    if (userInfo?.username) return userInfo.username;
+
+    return "anonymous";
   };
 
   console.log("⚡ Registering task handlers for:", socket.id);

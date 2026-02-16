@@ -72,6 +72,9 @@ io.on("connection", (socket) => {
   });
   emitOnlineUsers();
 
+  // Attach helper to get the socket's user info (for activity logging)
+  socket.getUserInfo = () => onlineUsers.get(socket.id) || { username: "Guest", socketId: socket.id };
+
   registerTaskHandlers(io, socket);
 
   socket.on("users:identify", (user) => {

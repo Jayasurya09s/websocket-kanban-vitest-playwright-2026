@@ -37,7 +37,7 @@ export default function Home() {
         transition={{ duration: 0.6 }}
         className="relative z-10 px-6 py-8"
       >
-        <div className="w-[96%] max-w-7xl mx-auto flex items-center justify-between">
+        <div className="w-full max-w-none mx-auto flex items-center justify-between">
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="text-2xl md:text-3xl font-bold"
@@ -64,8 +64,10 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="relative z-10 px-6 py-12 md:py-20">
-        <div className="w-[96%] max-w-7xl mx-auto">
-          <div className="text-center max-w-4xl mx-auto space-y-8">
+
+        <div className="w-full max-w-none mx-auto">
+          <div className="min-h-[70vh] flex items-center justify-center">
+            <div className="text-center max-w-5xl mx-auto space-y-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -101,7 +103,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                 <Link to="/register" className="btn btn-primary text-lg px-10 py-4 w-full sm:w-auto shadow-glow">
@@ -120,7 +122,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-8 pt-12 md:pt-16 max-w-4xl mx-auto"
+              className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-8 pt-16 md:pt-20 max-w-4xl mx-auto"
             >
               {[
                 { value: "99.9%", label: "Uptime" },
@@ -143,6 +145,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
+            </div>
           </div>
 
           {/* Features Grid */}
@@ -154,32 +157,32 @@ export default function Home() {
           >
             {[
               {
-                icon: "🚀",
+                icon: "⚡",
                 title: "Lightning Fast",
                 description: "Real-time updates powered by WebSocket technology. See changes instantly across all devices.",
               },
               {
-                icon: "🎨",
+                icon: "✨",
                 title: "Beautiful Design",
                 description: "Intuitive interface with smooth animations and modern glassmorphism effects.",
               },
               {
-                icon: "📊",
+                icon: "📈",
                 title: "Smart Analytics",
                 description: "Get insights into your productivity with comprehensive charts and statistics.",
               },
               {
-                icon: "☁️",
+                icon: "📁",
                 title: "Cloud Storage",
                 description: "Upload and attach files directly to tasks with Cloudinary integration.",
               },
               {
-                icon: "🔒",
+                icon: "🔐",
                 title: "Secure & Private",
                 description: "Your data is protected with JWT authentication and encrypted connections.",
               },
               {
-                icon: "📱",
+                icon: "🖥️",
                 title: "Fully Responsive",
                 description: "Works seamlessly on desktop, tablet, and mobile devices.",
               },
@@ -208,9 +211,9 @@ export default function Home() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.5 }}
-            className="mt-24 md:mt-32 text-center"
+            className="mt-28 md:mt-36 text-center"
           >
-            <div className="glass-card p-12 md:p-16 max-w-4xl mx-auto border-gradient feature-card">
+            <div className="glass-card p-12 md:p-16 max-w-none mx-auto border-gradient feature-card w-full">
               <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
                 Ready to boost your productivity?
               </h2>
@@ -232,7 +235,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 1.8 }}
             className="mt-24 pb-12 text-center text-gray-500 text-sm"
           >
-            <p>© 2024 KanbanFlow. Built with React, Socket.IO, and passion.</p>
+            <p>© 2026 KanbanFlow. Built with React, Socket.IO, and passion.</p>
           </motion.footer>
         </div>
       </main>
