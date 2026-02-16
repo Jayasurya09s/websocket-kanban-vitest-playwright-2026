@@ -1,9 +1,19 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import KanbanBoard from "../components/KanbanBoard";
 import ActivityPanel from "../components/ActivityPanel";
+import socket from "../api/socket";
 
 export default function Dashboard() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      socket.emit("sync:tasks");
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div
       className="min-h-screen noise-overlay"

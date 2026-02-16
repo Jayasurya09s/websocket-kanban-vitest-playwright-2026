@@ -3,6 +3,10 @@
 
 Modern real-time Kanban UI built with React, Vite, Tailwind CSS, and Socket.IO. The app connects to the backend API for auth, tasks, activity, uploads, and analytics.
 
+## Live Demo
+
+- https://kanbanflow-xi.vercel.app/
+
 ## Features
 
 - Auth flows: register, login, logout
