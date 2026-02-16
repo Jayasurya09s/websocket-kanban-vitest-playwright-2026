@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -5,6 +6,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import { useAuth } from "./context/AuthContext";
+import socket from "./api/socket";
 
 function Private({ children }) {
   const { token } = useAuth();
@@ -13,6 +15,17 @@ function Private({ children }) {
 }
 
 export default function App() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+    socket.emit("users:identify", {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    });
+  }, [user]);
+
   return (
     <Routes>
 

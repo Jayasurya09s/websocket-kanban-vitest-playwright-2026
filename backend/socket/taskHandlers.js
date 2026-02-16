@@ -2,6 +2,12 @@ const taskService = require("../services/taskService");
 
 module.exports = function registerTaskHandlers(io, socket) {
 
+  const getActor = (user) => {
+    if (!user) return "anonymous";
+    if (typeof user === "string") return user;
+    return user.username || user.email || user.id || "anonymous";
+  };
+
   console.log("⚡ Registering task handlers for:", socket.id);
 
   // ================= SYNC ALL TASKS =================
@@ -21,7 +27,11 @@ module.exports = function registerTaskHandlers(io, socket) {
   // ================= CREATE TASK =================
   socket.on("task:create", async (data, callback) => {
     try {
-      const task = await taskService.createTask(data, socket.id);
+      const payload = data || {};
+      const actor = getActor(payload.user);
+      const { user, ...taskData } = payload;
+
+      const task = await taskService.createTask(taskData, actor);
 
       io.emit("task:created", task); // broadcast to all
       callback?.({ status: "ok", task });
@@ -33,13 +43,13 @@ module.exports = function registerTaskHandlers(io, socket) {
   });
 
   // ================= UPDATE TASK =================
-  socket.on("task:update", async ({ taskId, updates }, callback) => {
+  socket.on("task:update", async (data, callback) => {
     try {
-      const updated = await taskService.updateTask(
-        taskId,
-        updates,
-        socket.id
-      );
+      const taskId = data?.taskId;
+      const updates = data?.updates || {};
+      const actor = getActor(data?.user);
+
+      const updated = await taskService.updateTask(taskId, updates, actor);
 
       io.emit("task:updated", updated);
       callback?.({ status: "ok", task: updated });
@@ -51,13 +61,13 @@ module.exports = function registerTaskHandlers(io, socket) {
   });
 
   // ================= MOVE TASK =================
-  socket.on("task:move", async ({ taskId, column }, callback) => {
+  socket.on("task:move", async (data, callback) => {
     try {
-      const moved = await taskService.moveTask(
-        taskId,
-        column,
-        socket.id
-      );
+      const taskId = data?.taskId;
+      const column = data?.column;
+      const actor = getActor(data?.user);
+
+      const moved = await taskService.moveTask(taskId, column, actor);
 
       io.emit("task:moved", moved);
       callback?.({ status: "ok", task: moved });
@@ -69,13 +79,13 @@ module.exports = function registerTaskHandlers(io, socket) {
   });
 
   // ================= REORDER TASKS =================
-  socket.on("task:reorder", async ({ column, orderedIds }, callback) => {
+  socket.on("task:reorder", async (data, callback) => {
     try {
-      const tasks = await taskService.reorderTasks(
-        column,
-        orderedIds,
-        socket.id
-      );
+      const column = data?.column;
+      const orderedIds = data?.orderedIds || [];
+      const actor = getActor(data?.user);
+
+      const tasks = await taskService.reorderTasks(column, orderedIds, actor);
 
       io.emit("sync:tasks", tasks);
       callback?.({ status: "ok" });
@@ -87,9 +97,12 @@ module.exports = function registerTaskHandlers(io, socket) {
   });
 
   // ================= DELETE TASK =================
-  socket.on("task:delete", async (taskId, callback) => {
+  socket.on("task:delete", async (data, callback) => {
     try {
-      await taskService.deleteTask(taskId, socket.id);
+      const taskId = typeof data === "string" ? data : data?.taskId;
+      const actor = getActor(typeof data === "string" ? null : data?.user);
+
+      await taskService.deleteTask(taskId, actor);
 
       io.emit("task:deleted", taskId);
       callback?.({ status: "ok" });
@@ -101,13 +114,13 @@ module.exports = function registerTaskHandlers(io, socket) {
   });
 
   // ================= ADD ATTACHMENT =================
-  socket.on("attachment:add", async ({ taskId, file }, callback) => {
+  socket.on("attachment:add", async (data, callback) => {
     try {
-      const attachment = await taskService.addAttachment(
-        taskId,
-        file,
-        socket.id
-      );
+      const taskId = data?.taskId;
+      const file = data?.file;
+      const actor = getActor(data?.user);
+
+      const attachment = await taskService.addAttachment(taskId, file, actor);
 
       io.emit("attachment:added", { taskId, attachment });
       callback?.({ status: "ok", attachment });

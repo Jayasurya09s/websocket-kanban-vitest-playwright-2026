@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import socket from "../api/socket";
 import { FaTrash, FaPaperclip, FaPen, FaFolderOpen } from "react-icons/fa";
 import AttachmentsModal from "./AttachmentsModal";
+import { useAuth } from "../context/AuthContext";
 
 const PRIORITY_COLOR = {
   low: "bg-sky-500/10 text-sky-200 border-sky-500/20",
@@ -18,7 +19,9 @@ const CATEGORY_BADGE = {
 };
 
 export default function TaskCard({ task, openUpload, openEdit, moveCard, commitReorder }) {
+  const { user } = useAuth();
   const [showFiles, setShowFiles] = useState(false);
+  const actor = user ? { id: user._id, username: user.username, email: user.email } : null;
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: "TASK",
     item: { id: task._id, column: task.column },
@@ -37,7 +40,7 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
     drop: (item) => {
       if (!item) return;
       if (item.column !== task.column) {
-        socket.emit("task:move", { taskId: item.id, column: task.column });
+        socket.emit("task:move", { taskId: item.id, column: task.column, user: actor });
         return;
       }
       commitReorder?.(task.column);
@@ -132,7 +135,7 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => socket.emit("task:delete", task._id)}
+          onClick={() => socket.emit("task:delete", { taskId: task._id, user: actor })}
           className="btn btn-secondary text-rose-300 hover:text-rose-200 px-3"
           title="Delete task"
         >
@@ -161,7 +164,9 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
         <label className="text-[10px] uppercase tracking-widest text-slate-500">Status</label>
         <select
           value={task.column}
-          onChange={(e) => socket.emit("task:move", { taskId: task._id, column: e.target.value })}
+          onChange={(e) =>
+            socket.emit("task:move", { taskId: task._id, column: e.target.value, user: actor })
+          }
           className="select-field mt-2 text-xs"
         >
           <option value="todo">To Do</option>

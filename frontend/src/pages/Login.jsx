@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import API from "../api/http";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import LiveUsersBadge from "../components/LiveUsersBadge";
 
 export default function Login() {
   const { login } = useAuth();
@@ -32,11 +33,14 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-16 noise-overlay">
       <div className="w-full max-w-md relative z-10">
-        <Link to="/" className="inline-block mb-8">
-          <motion.div whileHover={{ scale: 1.03 }} className="text-2xl font-semibold text-white">
-            Kanban<span className="gradient-text">Flow</span>
-          </motion.div>
-        </Link>
+        <div className="flex items-center justify-between mb-8">
+          <Link to="/" className="inline-block">
+            <motion.div whileHover={{ scale: 1.03 }} className="text-2xl font-semibold text-white">
+              Kanban<span className="gradient-text">Flow</span>
+            </motion.div>
+          </Link>
+          <LiveUsersBadge />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

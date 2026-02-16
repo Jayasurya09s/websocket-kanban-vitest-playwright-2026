@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import LiveUsersBadge from "../components/LiveUsersBadge";
 
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -46,6 +47,7 @@ export default function Home() {
           </motion.div>
 
           <div className="flex items-center gap-3 md:gap-4">
+            <LiveUsersBadge />
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link to="/login" className="btn btn-secondary text-sm md:text-base">
                 Sign In

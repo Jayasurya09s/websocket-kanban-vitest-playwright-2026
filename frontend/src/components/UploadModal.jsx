@@ -2,8 +2,10 @@ import { useState } from "react";
 import API from "../api/http";
 import { motion } from "framer-motion";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 export default function UploadModal({ task, close }) {
+  const { user } = useAuth();
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -18,6 +20,9 @@ export default function UploadModal({ task, close }) {
     const form = new FormData();
     form.append("file", file);
     form.append("taskId", task._id);
+    if (user?.username || user?.email) {
+      form.append("user", user.username || user.email);
+    }
 
     setIsUploading(true);
     try {

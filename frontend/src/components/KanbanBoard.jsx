@@ -8,6 +8,7 @@ import UploadModal from "./UploadModal";
 import EditTaskModal from "./EditTaskModal";
 import BoardMenuModal from "./BoardMenuModal";
 import API from "../api/http";
+import { useAuth } from "../context/AuthContext";
 
 const columns = [
   { id: "todo", title: "To Do", icon: "📋" },
@@ -16,6 +17,7 @@ const columns = [
 ];
 
 export default function KanbanBoard() {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [open, setOpen] = useState(false);
   const [uploadTask, setUploadTask] = useState(null);
@@ -31,6 +33,8 @@ export default function KanbanBoard() {
     swimlaneMode: "none",
     powerUps: { calendar: false, analytics: true }
   });
+
+  const actor = user ? { id: user._id, username: user.username, email: user.email } : null;
 
   useEffect(() => {
     tasksRef.current = tasks;
@@ -183,7 +187,7 @@ export default function KanbanBoard() {
       .map((task) => task._id);
 
     if (orderedIds.length > 0) {
-      socket.emit("task:reorder", { column: columnId, orderedIds });
+      socket.emit("task:reorder", { column: columnId, orderedIds, user: actor });
     }
   };
 
@@ -249,6 +253,7 @@ export default function KanbanBoard() {
                     openEdit={setEditTask}
                     moveCard={moveCard}
                     commitReorder={commitReorder}
+                    actor={actor}
                   />
                 </motion.div>
               ))}
@@ -288,6 +293,7 @@ export default function KanbanBoard() {
                         openEdit={setEditTask}
                         moveCard={moveCard}
                         commitReorder={commitReorder}
+                        actor={actor}
                       />
                     ))}
                   </div>
@@ -316,12 +322,12 @@ export default function KanbanBoard() {
   );
 }
 
-function Column({ col, tasks, openUpload, openEdit, moveCard, commitReorder }) {
+function Column({ col, tasks, openUpload, openEdit, moveCard, commitReorder, actor }) {
   const [isOver, setIsOver] = useState(false);
   const [, drop] = useDrop(() => ({
     accept: "TASK",
     drop: (item) => {
-      socket.emit("task:move", { taskId: item.id, column: col.id });
+      socket.emit("task:move", { taskId: item.id, column: col.id, user: actor });
     },
     hover: () => setIsOver(true),
     collect: (monitor) => ({

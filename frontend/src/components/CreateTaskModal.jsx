@@ -1,8 +1,10 @@
 import { useState } from "react";
 import socket from "../api/socket";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
 export default function CreateTaskModal({ open, onClose }) {
+  const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [priority, setPriority] = useState("medium");
@@ -22,13 +24,18 @@ export default function CreateTaskModal({ open, onClose }) {
 
     setIsSubmitting(true);
     try {
+      const actor = user
+        ? { id: user._id, username: user.username, email: user.email }
+        : null;
+
       socket.emit("task:create", {
         title: title.trim(),
         description: desc.trim(),
         priority,
         category,
         labels,
-        dueDate: dueDate ? new Date(dueDate).toISOString() : null
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+        user: actor
       });
 
       setTitle("");

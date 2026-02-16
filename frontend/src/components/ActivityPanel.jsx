@@ -93,7 +93,13 @@ export default function ActivityPanel() {
               <p className="text-sm text-slate-400">No activity yet</p>
             </motion.div>
           ) : (
-            logs.map((log, index) => (
+            logs.map((log, index) => {
+              const actor =
+                typeof log.performedBy === "string"
+                  ? log.performedBy
+                  : log.performedBy?.username || log.performedBy?.email || "Someone";
+
+              return (
               <motion.div
                 key={log._id}
                 initial={{ opacity: 0, x: -20 }}
@@ -116,6 +122,9 @@ export default function ActivityPanel() {
                     <p className="text-xs text-slate-400">
                       {ACTION_LABELS[log.action] || log.action}
                     </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      by {actor || "Someone"}
+                    </p>
                     <p className="text-xs text-slate-500 mt-2">
                       {new Date(log.createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
@@ -133,7 +142,8 @@ export default function ActivityPanel() {
                   </span>
                 </div>
               </motion.div>
-            ))
+              );
+            })
           )}
         </AnimatePresence>
       </div>

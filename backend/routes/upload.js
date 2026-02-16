@@ -27,7 +27,7 @@ const upload = multer({
 // ================= UPLOAD ROUTE =================
 router.post("/", upload.single("file"), async (req, res) => {
   try {
-    const { taskId } = req.body;
+    const { taskId, user } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "File missing" });
@@ -59,11 +59,8 @@ router.post("/", upload.single("file"), async (req, res) => {
     };
 
     // save in mongo + attach to task
-    const attachment = await taskService.addAttachment(
-      taskId,
-      fileData,
-      "cloud-user"
-    );
+    const actor = user || "cloud-user";
+    const attachment = await taskService.addAttachment(taskId, fileData, actor);
 
     res.json({
       message: "uploaded",

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import socket from "../api/socket";
+import { useAuth } from "../context/AuthContext";
 
 export default function EditTaskModal({ task, onClose, users }) {
+  const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [priority, setPriority] = useState("medium");
@@ -37,6 +39,10 @@ export default function EditTaskModal({ task, onClose, users }) {
 
     setIsSubmitting(true);
     try {
+      const actor = user
+        ? { id: user._id, username: user.username, email: user.email }
+        : null;
+
       socket.emit("task:update", {
         taskId: task._id,
         updates: {
@@ -49,6 +55,7 @@ export default function EditTaskModal({ task, onClose, users }) {
           dueDate: dueDate ? new Date(dueDate).toISOString() : null,
           members,
         },
+        user: actor
       });
       onClose();
     } finally {

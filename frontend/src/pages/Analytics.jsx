@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
+import LiveUsersBadge from "../components/LiveUsersBadge";
 import {
   PieChart,
   Pie,
@@ -40,7 +41,6 @@ export default function Analytics() {
   const [data, setData] = useState([]);
   const [boardId, setBoardId] = useState(null);
   const [activity, setActivity] = useState([]);
-  const [liveUsers, setLiveUsers] = useState(1);
 
   useEffect(() => {
     const handleSync = (tasks) => {
@@ -58,11 +58,9 @@ export default function Analytics() {
 
     socket.emit("sync:tasks");
     socket.on("sync:tasks", handleSync);
-    socket.on("users:online", setLiveUsers);
 
     return () => {
       socket.off("sync:tasks", handleSync);
-      socket.off("users:online", setLiveUsers);
     };
   }, []);
 
@@ -123,6 +121,28 @@ export default function Analytics() {
     { name: "Attachments", value: activity.filter((log) => log.action === "ATTACHMENT_ADDED").length }
   ];
 
+  const getActorName = (log) => {
+    const performer = log?.performedBy;
+    if (typeof performer === "string") return performer;
+    return performer?.username || performer?.email || "Someone";
+  };
+
+  const recentActivity = [...activity]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 6);
+
+  const topContributors = (() => {
+    const counts = new Map();
+    activity.forEach((log) => {
+      const name = getActorName(log);
+      counts.set(name, (counts.get(name) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  })();
+
 
   return (
     <div className="min-h-screen noise-overlay">
@@ -142,9 +162,7 @@ export default function Analytics() {
                 <h1 className="text-3xl md:text-4xl font-semibold text-white">Analytics</h1>
                 <p className="text-sm text-slate-400 mt-2">Realtime distribution of tasks across the board.</p>
               </div>
-              <div className="glass-panel-hover px-4 py-2 text-xs text-slate-200">
-                {liveUsers} {liveUsers === 1 ? "person" : "people"} live
-              </div>
+              <LiveUsersBadge />
             </div>
           </motion.div>
 
@@ -341,6 +359,59 @@ export default function Analytics() {
                     <span className="text-sm text-slate-200 font-semibold">{item.value}</span>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="grid gap-6 mt-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.52 }}
+              className="surface p-6 md:p-8"
+            >
+              <h3 className="text-lg font-semibold text-white mb-4">Recent activity</h3>
+              <p className="text-xs text-slate-500 mb-6">Latest updates and who made them.</p>
+              <div className="space-y-3">
+                {recentActivity.length === 0 ? (
+                  <div className="text-sm text-slate-400">No activity yet.</div>
+                ) : (
+                  recentActivity.map((log) => (
+                    <div key={log._id} className="glass-panel-hover p-4">
+                      <div className="text-sm text-white font-semibold truncate">
+                        {log.metadata?.title || "Untitled task"}
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1">
+                        {log.action.replace(/_/g, " ")}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        by {getActorName(log)}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.58 }}
+              className="surface p-6 md:p-8"
+            >
+              <h3 className="text-lg font-semibold text-white mb-4">Top contributors</h3>
+              <p className="text-xs text-slate-500 mb-6">Most active members this week.</p>
+              <div className="space-y-3">
+                {topContributors.length === 0 ? (
+                  <div className="text-sm text-slate-400">No contributors yet.</div>
+                ) : (
+                  topContributors.map((person) => (
+                    <div key={person.name} className="flex items-center justify-between">
+                      <span className="text-sm text-slate-300 truncate">{person.name}</span>
+                      <span className="text-sm text-slate-200 font-semibold">{person.count}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </motion.div>
           </div>

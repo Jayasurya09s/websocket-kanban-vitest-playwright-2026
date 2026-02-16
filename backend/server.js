@@ -56,21 +56,40 @@ const io = new Server(server, {
   }
 });
 
-let onlineUsers = new Set();
+const onlineUsers = new Map();
+
+const emitOnlineUsers = () => {
+  const users = Array.from(onlineUsers.values());
+  io.emit("users:online", { count: users.length, users });
+};
 
 io.on("connection", (socket) => {
   console.log(" User connected:", socket.id);
 
-  onlineUsers.add(socket.id);
-  io.emit("users:online", onlineUsers.size);
+  onlineUsers.set(socket.id, {
+    socketId: socket.id,
+    username: "Guest"
+  });
+  emitOnlineUsers();
 
   registerTaskHandlers(io, socket);
+
+  socket.on("users:identify", (user) => {
+    const username = user?.username || user?.email || "Guest";
+    onlineUsers.set(socket.id, {
+      socketId: socket.id,
+      userId: user?.id || user?._id || null,
+      username,
+      email: user?.email || null
+    });
+    emitOnlineUsers();
+  });
 
   socket.on("disconnect", () => {
     console.log(" User disconnected:", socket.id);
 
     onlineUsers.delete(socket.id);
-    io.emit("users:online", onlineUsers.size);
+    emitOnlineUsers();
   });
 });
 

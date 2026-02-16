@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import socket from "../api/socket";
+import LiveUsersBadge from "./LiveUsersBadge";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -56,6 +57,8 @@ export default function Navbar() {
                   {isConnected ? "Live" : "Offline"}
                 </span>
               </div>
+
+              <LiveUsersBadge compact />
 
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500/80 to-cyan-400/80 flex items-center justify-center font-semibold text-white text-sm">
                 {user?.username?.[0]?.toUpperCase() || "U"}

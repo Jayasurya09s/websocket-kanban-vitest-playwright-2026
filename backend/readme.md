@@ -18,6 +18,8 @@ It supports:
 * Cloud-based file uploads
 * Activity tracking
 * JWT authentication
+* Board settings + swimlanes + power-ups
+* Labels, checklist, due dates, members, and task ordering
 * Production-grade testing and deployment
 
 The system is designed to be scalable, modular, and ready for real-world SaaS usage.
@@ -57,6 +59,8 @@ The system is designed to be scalable, modular, and ready for real-world SaaS us
 * Update tasks
 * Delete tasks
 * Move tasks between columns
+* Reorder tasks within a column
+* Labels, checklist items, due dates, and member assignments
 * Multi-client real-time sync using WebSockets
 
 All updates are instantly broadcast to connected users.
@@ -80,6 +84,7 @@ Every action is logged:
 * Task moved
 * Task updated
 * Attachment added
+* Task reordered
 
 APIs available to fetch:
 
@@ -99,6 +104,35 @@ Tracks active users in real time:
 ---
 
 ## 🔐 JWT Authentication
+# 🧭 Board Settings & Power-Ups
+
+Board-level settings are now supported:
+
+* Board name + description
+* Background themes
+* Swimlane mode (none, priority, member)
+* Power-ups (calendar, analytics)
+
+## 🧩 Trello-Style Task Metadata
+
+Tasks now include:
+
+* Labels
+* Checklist items (with done status)
+* Due dates
+* Member assignments
+* Ordering within each column
+
+# 🌐 API Endpoints (New)
+
+* GET /api/board → fetch board settings
+* PUT /api/board/settings → update board settings
+* GET /api/users → list users for member assignment
+
+# 🔌 Socket Events (New)
+
+* task:reorder → reorder tasks within a column
+
 
 Authentication system implemented:
 
