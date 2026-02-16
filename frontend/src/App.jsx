@@ -1,13 +1,29 @@
-import React from "react";
-import KanbanBoard from "./components/KanbanBoard";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Analytics from "./pages/Analytics";
+import { useAuth } from "./context/AuthContext";
 
-function App() {
-  return (
-    <div className="App">
-      <h1>Real-time Kanban Board</h1>
-      <KanbanBoard />
-    </div>
-  );
+function Private({ children }) {
+  const { token } = useAuth();
+  return token ? children : <Navigate to="/login" />;
 }
 
-export default App;
+export default function App() {
+  return (
+    <Routes>
+
+      {/* public */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* app */}
+      <Route path="/dashboard" element={<Private><Dashboard/></Private>} />
+      <Route path="/analytics" element={<Private><Analytics/></Private>} />
+
+    </Routes>
+  );
+}

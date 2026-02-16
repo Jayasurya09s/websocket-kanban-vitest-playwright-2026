@@ -3,6 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
 
+const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
 
@@ -20,6 +21,11 @@ const server = http.createServer(app);
 connectDB();
 
 // ================= SECURITY & LOGGING =================
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(morgan("dev"));
 
 const limiter = rateLimit({
