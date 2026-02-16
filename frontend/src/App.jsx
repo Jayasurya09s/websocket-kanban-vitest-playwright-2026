@@ -19,11 +19,19 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return;
-    socket.emit("users:identify", {
+    const payload = {
       id: user._id,
       username: user.username,
       email: user.email
-    });
+    };
+
+    const identify = () => socket.emit("users:identify", payload);
+    identify();
+    socket.on("connect", identify);
+
+    return () => {
+      socket.off("connect", identify);
+    };
   }, [user]);
 
   return (

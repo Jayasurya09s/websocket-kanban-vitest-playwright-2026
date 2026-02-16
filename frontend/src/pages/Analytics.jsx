@@ -41,6 +41,7 @@ export default function Analytics() {
   const [data, setData] = useState([]);
   const [boardId, setBoardId] = useState(null);
   const [activity, setActivity] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState(new Map());
 
   useEffect(() => {
     const handleSync = (tasks) => {
@@ -59,8 +60,23 @@ export default function Analytics() {
     socket.emit("sync:tasks");
     socket.on("sync:tasks", handleSync);
 
+    const handleOnline = (payload) => {
+      if (!payload || typeof payload === "number") return;
+      const users = Array.isArray(payload.users) ? payload.users : [];
+      const next = new Map();
+      users.forEach((user) => {
+        if (user?.socketId) {
+          next.set(user.socketId, user.username || user.email || "Guest");
+        }
+      });
+      setOnlineUsers(next);
+    };
+
+    socket.on("users:online", handleOnline);
+
     return () => {
       socket.off("sync:tasks", handleSync);
+      socket.off("users:online", handleOnline);
     };
   }, []);
 
@@ -123,8 +139,11 @@ export default function Analytics() {
 
   const getActorName = (log) => {
     const performer = log?.performedBy;
-    if (typeof performer === "string") return performer;
-    return performer?.username || performer?.email || "Someone";
+    if (typeof performer === "string") {
+      if (performer.includes("@")) return performer;
+      return onlineUsers.get(performer) || "Guest";
+    }
+    return performer?.username || performer?.email || "Guest";
   };
 
   const recentActivity = [...activity]
@@ -184,9 +203,9 @@ export default function Analytics() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="surface p-6 md:p-8 h-[420px] relative overflow-hidden"
+              className="surface p-6 md:p-8 h-105 relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5" />
+              <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-cyan-500/5" />
               <div className="relative z-10 h-full">
                 {total === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-4">
@@ -329,7 +348,7 @@ export default function Analytics() {
             >
               <h3 className="text-lg font-semibold text-white mb-4">Activity trend</h3>
               <p className="text-xs text-slate-500 mb-6">Last 7 days of board activity.</p>
-              <div className="h-[260px]">
+              <div className="h-65">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={activityByDay} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.15)" />
@@ -425,7 +444,7 @@ export default function Analytics() {
             >
               <h3 className="text-lg font-semibold text-white mb-4">Status bars</h3>
               <p className="text-xs text-slate-500 mb-6">Task count by column.</p>
-              <div className="h-[260px]">
+              <div className="h-65">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={statusRows} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.15)" />
@@ -446,7 +465,7 @@ export default function Analytics() {
             >
               <h3 className="text-lg font-semibold text-white mb-4">Action volume</h3>
               <p className="text-xs text-slate-500 mb-6">Activity totals by type.</p>
-              <div className="h-[260px]">
+              <div className="h-65">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activityByType} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.15)" />

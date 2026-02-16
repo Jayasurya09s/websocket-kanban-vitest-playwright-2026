@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/http";
 import socket from "../api/socket";
 import { FaSpinner } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 const ACTION_LABELS = {
   TASK_CREATED: "Created",
@@ -29,8 +30,10 @@ const ACTION_ICONS = {
 };
 
 export default function ActivityPanel() {
+  const { user } = useAuth();
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [onlineUsers, setOnlineUsers] = useState(new Map());
 
   useEffect(() => {
     const handleSync = (tasks) => {
@@ -53,10 +56,36 @@ export default function ActivityPanel() {
     socket.emit("sync:tasks");
     socket.on("sync:tasks", handleSync);
 
+    const handleOnline = (payload) => {
+      if (!payload || typeof payload === "number") return;
+      const users = Array.isArray(payload.users) ? payload.users : [];
+      const next = new Map();
+      users.forEach((user) => {
+        if (user?.socketId) {
+          next.set(user.socketId, user.username || user.email || "Guest");
+        }
+      });
+      setOnlineUsers(next);
+    };
+
+    socket.on("users:online", handleOnline);
+
     return () => {
       socket.off("sync:tasks", handleSync);
+      socket.off("users:online", handleOnline);
     };
   }, []);
+
+  const resolveActor = (log) => {
+    const performer = log?.performedBy;
+    if (typeof performer === "string") {
+      if (performer.includes("@")) return performer;
+      if (performer === socket.id && user?.username) return user.username;
+      const mapped = onlineUsers.get(performer);
+      return mapped || "Guest";
+    }
+    return performer?.username || performer?.email || "Guest";
+  };
 
   return (
     <motion.div
@@ -93,13 +122,7 @@ export default function ActivityPanel() {
               <p className="text-sm text-slate-400">No activity yet</p>
             </motion.div>
           ) : (
-            logs.map((log, index) => {
-              const actor =
-                typeof log.performedBy === "string"
-                  ? log.performedBy
-                  : log.performedBy?.username || log.performedBy?.email || "Someone";
-
-              return (
+            logs.map((log, index) => (
               <motion.div
                 key={log._id}
                 initial={{ opacity: 0, x: -20 }}
@@ -123,7 +146,7 @@ export default function ActivityPanel() {
                       {ACTION_LABELS[log.action] || log.action}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      by {actor || "Someone"}
+                      Name: {resolveActor(log)}
                     </p>
                     <p className="text-xs text-slate-500 mt-2">
                       {new Date(log.createdAt).toLocaleTimeString([], {
@@ -133,7 +156,7 @@ export default function ActivityPanel() {
                     </p>
                   </div>
                   <span
-                    className={`text-xs px-2.5 py-1 rounded-full border font-semibold flex-shrink-0 ${
+                    className={`text-xs px-2.5 py-1 rounded-full border font-semibold shrink-0 ${
                       ACTION_COLORS[log.action] ||
                       "bg-gray-500/15 text-gray-300 border-gray-500/30"
                     }`}
@@ -142,8 +165,7 @@ export default function ActivityPanel() {
                   </span>
                 </div>
               </motion.div>
-              );
-            })
+            ))
           )}
         </AnimatePresence>
       </div>

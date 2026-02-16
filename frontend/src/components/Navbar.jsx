@@ -60,7 +60,7 @@ export default function Navbar() {
 
               <LiveUsersBadge compact />
 
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500/80 to-cyan-400/80 flex items-center justify-center font-semibold text-white text-sm">
+              <div className="w-9 h-9 rounded-full bg-linear-to-br from-emerald-500/80 to-cyan-400/80 flex items-center justify-center font-semibold text-white text-sm">
                 {user?.username?.[0]?.toUpperCase() || "U"}
               </div>
 

@@ -36,7 +36,7 @@ export default function AttachmentsModal({ taskTitle, attachments, onClose }) {
           <h2 className="text-2xl font-semibold text-white mt-2">{taskTitle}</h2>
         </div>
 
-        <div className="space-y-3 max-h-[360px] overflow-y-auto pr-2">
+        <div className="space-y-3 max-h-90 overflow-y-auto pr-2">
           {attachments.length === 0 ? (
             <p className="text-sm text-slate-400">No files uploaded yet.</p>
           ) : (

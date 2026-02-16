@@ -346,7 +346,7 @@ function Column({ col, tasks, openUpload, openEdit, moveCard, commitReorder, act
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   return (
-    <div ref={drop} className="min-w-[280px]">
+    <div ref={drop} className="min-w-70">
       <motion.div
         whileHover={{ y: -2 }}
         className={`glass-panel-hover p-5 h-full transition-all duration-300 ${
@@ -365,7 +365,7 @@ function Column({ col, tasks, openUpload, openEdit, moveCard, commitReorder, act
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 min-h-[380px]">
+        <div className="flex flex-col gap-3 min-h-95">
           <AnimatePresence mode="popLayout">
             {columnTasks.map((t, index) => (
               <motion.div

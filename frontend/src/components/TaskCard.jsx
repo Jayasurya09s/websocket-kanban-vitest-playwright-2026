@@ -51,10 +51,21 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
     <motion.div
       ref={(node) => preview(drop(node))}
       whileHover={{ y: -4 }}
-      style={{ opacity: isDragging ? 0.4 : 1 }}
       className="glass-panel-hover p-4 group"
+      style={{
+        opacity: isDragging ? 0.4 : 1,
+        padding: "18px",
+        borderRadius: "16px",
+        background: "linear-gradient(160deg, rgba(15, 23, 42, 0.78), rgba(10, 15, 28, 0.9))",
+        border: "1px solid rgba(148, 163, 184, 0.18)",
+        boxShadow: "0 18px 45px rgba(2, 6, 23, 0.45)",
+      }}
     >
-      <div ref={drag} className="cursor-grab active:cursor-grabbing">
+      <div
+        ref={drag}
+        className="cursor-grab active:cursor-grabbing"
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}
+      >
         <h4 className="font-semibold text-white text-sm mb-2 line-clamp-2">
           {task.title}
         </h4>
@@ -66,11 +77,12 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-3" style={{ gap: "8px", marginBottom: "12px" }}>
         <span
           className={`text-[11px] px-2 py-1 rounded-full border font-semibold ${
             PRIORITY_COLOR[task.priority || "medium"] || PRIORITY_COLOR.medium
           }`}
+          style={{ letterSpacing: "0.02em" }}
         >
           {(task.priority || "medium").charAt(0).toUpperCase() + (task.priority || "medium").slice(1)}
         </span>
@@ -79,6 +91,7 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
           className={`text-[11px] px-2 py-1 rounded-full border font-semibold ${
             CATEGORY_BADGE[task.category || "feature"] || CATEGORY_BADGE.feature
           }`}
+          style={{ letterSpacing: "0.02em" }}
         >
           {(task.category || "feature").charAt(0).toUpperCase() + (task.category || "feature").slice(1)}
         </span>
@@ -100,12 +113,13 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => openUpload(task)}
-          className="flex-1 btn btn-secondary text-xs py-2 justify-center"
+          className="flex-1 min-w-30 btn btn-secondary text-xs py-2 justify-center"
+          style={{ padding: "8px 12px", borderRadius: "12px" }}
         >
           <FaPaperclip className="w-3 h-3" />
           <span>Attach</span>
@@ -116,7 +130,8 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
           whileTap={{ scale: task.attachments?.length ? 0.95 : 1 }}
           onClick={() => setShowFiles(true)}
           disabled={!task.attachments || task.attachments.length === 0}
-          className="btn btn-secondary text-slate-300 hover:text-white px-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn btn-secondary text-slate-300 hover:text-white px-3 disabled:opacity-50 disabled:cursor-not-allowed flex-none"
+          style={{ padding: "8px 10px", borderRadius: "12px" }}
           title="View files"
         >
           <FaFolderOpen className="w-3.5 h-3.5" />
@@ -126,7 +141,8 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => openEdit(task)}
-          className="btn btn-secondary text-emerald-300 hover:text-emerald-200 px-3"
+          className="btn btn-secondary text-emerald-300 hover:text-emerald-200 px-3 flex-none"
+          style={{ padding: "8px 10px", borderRadius: "12px" }}
           title="Edit task"
         >
           <FaPen className="w-3.5 h-3.5" />
@@ -136,7 +152,8 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => socket.emit("task:delete", { taskId: task._id, user: actor })}
-          className="btn btn-secondary text-rose-300 hover:text-rose-200 px-3"
+          className="btn btn-secondary text-rose-300 hover:text-rose-200 px-3 flex-none"
+          style={{ padding: "8px 10px", borderRadius: "12px" }}
           title="Delete task"
         >
           <FaTrash className="w-3.5 h-3.5" />
@@ -167,6 +184,7 @@ export default function TaskCard({ task, openUpload, openEdit, moveCard, commitR
           onChange={(e) =>
             socket.emit("task:move", { taskId: task._id, column: e.target.value, user: actor })
           }
+          style={{ color: "#f8fafc", backgroundColor: "#0f172a" }}
           className="select-field mt-2 text-xs"
         >
           <option value="todo">To Do</option>
